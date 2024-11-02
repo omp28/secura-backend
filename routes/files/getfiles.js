@@ -1,9 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const File = require("../../models/FileSchema");
-const path = require("path");
-
-router.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 router.get("/:userID", async (req, res) => {
   const userID = req.params.userID;
@@ -17,7 +14,11 @@ router.get("/:userID", async (req, res) => {
 
     const fileList = files.map((file) => ({
       filename: file.fileName,
-      url: `http://localhost:5001/${file.filePath}`,
+      fileType: file.fileType,
+      fileSize: file.fileSize,
+      fileData: `data:${file.fileType};base64,${file.fileData.toString(
+        "base64"
+      )}`,
     }));
 
     res.status(200).json(fileList);

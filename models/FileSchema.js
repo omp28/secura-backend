@@ -18,9 +18,9 @@ const FileSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  filePath: {
-    type: String,
-    required: true,
+  fileData: {
+    type: Buffer,
+    require: true,
   },
   createdAt: {
     type: Date,
