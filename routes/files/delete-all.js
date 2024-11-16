@@ -4,7 +4,7 @@ const File = require("../../models/FileSchema");
 
 router.delete("/:userID", async (req, res) => {
   const userID = req.params.userID;
-
+  console.log(userID);
   try {
     await File.deleteMany({ userID });
 
