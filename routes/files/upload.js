@@ -32,6 +32,7 @@ router.post("/", upload.array("files", 10), async (req, res) => {
           fileType: file.mimetype,
           fileSize: file.size,
           fileData: file.buffer,
+          folderID: req.body.folderID || null,
         });
 
         await newFile.save();
