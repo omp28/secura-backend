@@ -28,9 +28,9 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use("/api/auth/signup", signupRoutes);
 app.use("/api/auth/login", loginRoutes);
-app.use("/api/files/upload", fileuploadRoutes);
-app.use("/api/files/delete-all", deleteAllRoutes);
+app.use("/api/files", fileuploadRoutes);
 app.use("/api/folders", folderRoutes);
+app.use("/api/files/delete-all", deleteAllRoutes);
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {

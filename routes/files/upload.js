@@ -52,4 +52,16 @@ router.post("/", upload.array("files", 10), async (req, res) => {
   }
 });
 
+router.delete("/file/:fileID", async (req, res) => {
+  const { fileID } = req.params;
+
+  try {
+    await File.findByIdAndDelete(fileID);
+    res.status(200).json({ message: "File deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting file:", error);
+    res.status(500).json({ message: "Error deleting file", error });
+  }
+});
+
 module.exports = router;
