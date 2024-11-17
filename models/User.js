@@ -7,6 +7,11 @@ const UserSchema = new mongoose.Schema({
     default: uuidv4,
     unique: true,
   },
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+  },
   publicKey: {
     type: String,
     required: true,

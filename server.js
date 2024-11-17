@@ -6,6 +6,7 @@ const loginRoutes = require("./routes/auth/login");
 const fileuploadRoutes = require("./routes/files/upload");
 const deleteAllRoutes = require("./routes/files/delete-all");
 const folderRoutes = require("./routes/files/folder");
+const checkUsernameRoutes = require("./routes/auth/username");
 const verifyToken = require("./middlewares/auth");
 const multer = require("multer");
 const fs = require("fs");
@@ -31,6 +32,7 @@ app.use("/api/auth/login", loginRoutes);
 app.use("/api/files", fileuploadRoutes);
 app.use("/api/folders", folderRoutes);
 app.use("/api/files/delete-all", deleteAllRoutes);
+app.use("/api/auth/usernames", checkUsernameRoutes);
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
