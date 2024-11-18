@@ -16,7 +16,6 @@ const storage = multer.diskStorage({
   },
 });
 
-// const upload = multer({ storage: storage });
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.post("/", upload.array("files", 10), async (req, res) => {
@@ -28,6 +27,7 @@ router.post("/", upload.array("files", 10), async (req, res) => {
       const fileSavePromises = files.map(async (file) => {
         const newFile = new File({
           userID: userID,
+          author: userID,
           fileName: file.originalname,
           fileType: file.mimetype,
           fileSize: file.size,

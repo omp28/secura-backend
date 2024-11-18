@@ -2,6 +2,20 @@ const express = require("express");
 const router = express.Router();
 const File = require("../../models/FileSchema");
 
+const shareFile = async (fileID, sharedWith, author) => {
+  const validUsers = sharedWith.filter((user) => user !== author);
+
+  if (validUsers.length === 0) {
+    throw new Error("Cannot share the file with the author.");
+  }
+
+  return await File.findByIdAndUpdate(
+    fileID,
+    { sharedWith: validUsers },
+    { new: true }
+  );
+};
+
 router.get("/", async (req, res) => {
   const { userID } = req.query;
 
@@ -21,12 +35,13 @@ router.post("/:fileID", async (req, res) => {
     const file = await File.findById(fileID);
     if (!file) return res.status(404).send("File not found");
 
-    file.sharedWith = [...new Set([...file.sharedWith, ...sharedWith])];
-    await file.save();
-
-    res.status(200).send("File shared successfully");
+    const updatedFile = await shareFile(fileID, sharedWith, file.author);
+    res
+      .status(200)
+      .json({ message: "File shared successfully", file: updatedFile });
   } catch (error) {
-    res.status(500).send("Error sharing file: " + error.message);
+    console.error("Error sharing file:", error);
+    res.status(500).json({ message: "Error sharing file", error });
   }
 });
 

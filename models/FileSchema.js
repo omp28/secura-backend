@@ -6,6 +6,11 @@ const FileSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  author: {
+    type: String,
+    ref: "User",
+    required: true,
+  },
   folderID: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Folder",
