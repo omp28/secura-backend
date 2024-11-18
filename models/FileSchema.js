@@ -27,6 +27,13 @@ const FileSchema = new mongoose.Schema({
     type: Buffer,
     require: true,
   },
+  sharedWith: [
+    {
+      type: String,
+      ref: "User",
+      required: false,
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now,

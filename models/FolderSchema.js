@@ -15,6 +15,13 @@ const FolderSchema = new mongoose.Schema({
     ref: "Folder",
     default: null,
   },
+  sharedWith: [
+    {
+      type: String,
+      ref: "User",
+      required: false,
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now,
