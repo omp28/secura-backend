@@ -1,32 +1,88 @@
 const express = require("express");
 const router = express.Router();
 const Folder = require("../../models/FolderSchema");
+const Share = require("../../models/ShareSchema");
 
-router.post("/:folderID", async (req, res) => {
-  const { folderID } = req.params;
-  const { sharedWith } = req.body;
+router.post("/:folderId", async (req, res) => {
+  const { folderId } = req.params;
+  const { sharedWith, permissions = "read" } = req.body;
 
   try {
-    const folder = await Folder.findById(folderID);
+    const folder = await Folder.findById(folderId);
     if (!folder) return res.status(404).send("Folder not found");
 
-    folder.sharedWith = [...new Set([...folder.sharedWith, ...sharedWith])];
-    await folder.save();
+    if (folder.userID === sharedWith) {
+      return res.status(400).json({ message: "Cannot share with yourself" });
+    }
 
-    res.status(200).send("Folder shared successfully");
+    const share = new Share({
+      resourceId: folderId,
+      resourceType: "Folder",
+      ownerId: folder.userID,
+      sharedWith,
+      permissions,
+    });
+
+    await share.save();
+
+    res.status(200).json({ message: "Folder shared successfully" });
   } catch (error) {
-    res.status(500).send("Error sharing folder: " + error.message);
+    if (error.code === 11000) {
+      return res
+        .status(400)
+        .json({ message: "Folder already shared with this user" });
+    }
+    res
+      .status(500)
+      .json({ message: "Error sharing folder", error: error.message });
   }
 });
 
-router.get("/", async (req, res) => {
-  const { userID } = req.query;
+router.get("/shared-by-me", async (req, res) => {
+  const { userId } = req.query;
 
   try {
-    const folders = await Folder.find({ sharedWith: userID });
-    res.status(200).json(folders);
+    const shares = await Share.find({
+      ownerId: userId,
+      resourceType: "Folder",
+    }).populate("resourceId");
+
+    const sharedFolders = shares.map((share) => ({
+      ...share.resourceId._doc,
+      sharedWith: share.sharedWith,
+      permissions: share.permissions,
+      sharedAt: share.sharedAt,
+    }));
+
+    res.status(200).json(sharedFolders);
   } catch (error) {
-    res.status(500).send("Error retrieving shared folders: " + error.message);
+    res
+      .status(500)
+      .json({ message: "Error fetching shared folders", error: error.message });
+  }
+});
+
+router.get("/shared-with-me", async (req, res) => {
+  const { userId } = req.query;
+
+  try {
+    const shares = await Share.find({
+      sharedWith: userId,
+      resourceType: "Folder",
+    }).populate("resourceId");
+
+    const sharedFolders = shares.map((share) => ({
+      ...share.resourceId._doc,
+      sharedBy: share.ownerId,
+      permissions: share.permissions,
+      sharedAt: share.sharedAt,
+    }));
+
+    res.status(200).json(sharedFolders);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error fetching shared folders", error: error.message });
   }
 });
 
